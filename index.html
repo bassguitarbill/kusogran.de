@@ -1,0 +1,88 @@
+<html>
+	<head>
+		<title>K U S O G R A N D E</title>
+		<link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css">
+		<link rel="stylesheet" href="style.css">
+		<script src="bower_components/jquery/dist/jquery.min.js"></script>
+		<script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+	</head>
+	<body>
+	<div class="jumbotron text-center">
+		<img src="logo.png" />
+		</div>
+		<div class="container">
+		<nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li class="active"><a href="#home">Home <span class="sr-only">(current)</span></a></li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Tournaments <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="#">Kusogrande</a></li>
+            <li><a href="#">Twosogrande</a></li>
+          </ul>
+        </li>
+        <li><a href="#">About</a></li>
+        <li><a href="#">Suggest</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+</div>
+		<p>Some games aren't good. That's okay. Not all games have to be good, or even playable. <strong>IT'S FINE</strong>.</p>
+		<p>Kusogrande (organized by <a href="https://twitter.com/brossentia">Brossentia</a>) is a tournament that celebrates mediocrity and so-bad-it's-good-ness in video games</p>
+	</body>
+	<script>
+		var participants;
+		var matches;
+		var vodURLs = [];
+		participantsPromise = new Promise(function(res, rej){
+			$.get("participants.json", function(data) {
+		console.log("participants");
+				participants = data;
+				res(data);
+			}).fail(function(x, error){
+				rej(error);
+			});
+		});
+		
+		matchesPromise = new Promise(function(res, rej){
+			$.get("matches.json", function(data) {
+		console.log("matches");
+				matches = data;
+				res(data);
+			}).fail(function(x, error){
+				rej(error);
+			});
+		});
+			
+		var promptForURLs = function() {
+			console.log("prompting for URLs");
+			matches.filter(m => m.match.state == "complete")
+				.forEach(m => {
+					// TODO get both players in one pass
+					var player1 = participants.filter(p => p.participant.id == m.match.player1_id)[0].participant;
+					var player2 = participants.filter(p => p.participant.id == m.match.player2_id)[0].participant;
+					var url = window.prompt(player1.display_name + " " + player2.display_name + " " + m.match.updated_at.substring(0,10));
+					vodURLs.push({match_id: m.match.id, vod_url: url});
+				})
+		}
+		
+		participantsPromise
+			.then(matchesPromise)
+			//.then(promptForURLs)
+	</script>
+</html>
